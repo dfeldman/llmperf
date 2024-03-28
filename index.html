@@ -196,6 +196,17 @@
       transition: right 0.3s;
       margin:10px;
     }
+    #footer {
+      width: 100%;
+      background-color: #1d1d1f;
+      color: white;
+      text-align: center;
+      padding: 10px;
+    }
+    #footer a {
+      color: white;
+      text-decoration: none;
+    }
   </style>
   </head>
   <body>
@@ -228,6 +239,7 @@
           <option value="score">Chatbot Arena ELO</option>
           <option value="mmlu_score">MMLU Score</option>
           <option value="mt_bench">MT-Bench</option>
+          <option value="context_length">Context</option>
         </select>
       </div>
       <div id="detailPanel" class="detail-panel">
@@ -269,13 +281,21 @@
       <h2>Open Models</h2>
       <p>This section is currently under development.</p>
     </div>
+
+    <div id="footer">
+    <h3>
+      <a href="https://github.com/dfeldman/llmperf" target="_blank">
+        <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub Link" style="width: 32px; height: 32px;"> Edit on GitHub
+      </a>
+    </h3>
+    </div>
     <script>
     const data = [
       {
         name: "Claude 3 Haiku",
         input_tokens_price_per_million: 0.25,
         output_tokens_price_per_million: 1.25,
-        context_length: "200000",
+        context_length: 200,
         score: 1179,
         mmlu_score: 75.2,
         mt_bench: null,
@@ -289,7 +309,7 @@
         name: "Claude 3 Sonnet",
         input_tokens_price_per_million: 3,
         output_tokens_price_per_million: 15,
-        context_length: "200000",
+        context_length: 200,
         score: 1198,
         mmlu_score: 79.0,
         mt_bench: null,
@@ -303,7 +323,7 @@
         name: "Claude 3 Opus",
         input_tokens_price_per_million: 15,
         output_tokens_price_per_million: 75,
-        context_length: "200000",
+        context_length: 200,
         score: 1253,
         mmlu_score: 86.8,
         mt_bench: null,
@@ -317,7 +337,7 @@
         name: "GPT-4 Turbo (128k context)",
         input_tokens_price_per_million: 10,
         output_tokens_price_per_million: 30,
-        context_length: "128000",
+        context_length: 128,
         score: 1251,
         mmlu_score: 86.4,
         mt_bench: 9.32,
@@ -331,7 +351,7 @@
         name: "GPT-4",
         input_tokens_price_per_million: 30,
         output_tokens_price_per_million: 60,
-        context_length: "32000",
+        context_length: 32,
         score: 1159,
         mmlu_score: 86.4,
         mt_bench: 8.96,
@@ -345,7 +365,7 @@
         name: "GPT-3.5 Turbo 0613",
         input_tokens_price_per_million: 0.50,
         output_tokens_price_per_million: 1.50,
-        context_length: "16000",
+        context_length: 16,
         score: 1114,
         mmlu_score: 70,
         mt_bench: 8.39,
@@ -359,7 +379,7 @@
         name: "Mistral Medium",
         input_tokens_price_per_million: 2.7,
         output_tokens_price_per_million: 8.1,
-        context_length: "8000",
+        context_length: 8,
         score: 1145,
         mmlu_score: null,
         mt_bench: null,
@@ -373,7 +393,7 @@
         name: "Mistral Large",
         input_tokens_price_per_million: 8,
         output_tokens_price_per_million: 24,
-        context_length: "32000",
+        context_length: 32,
         score: 1157,
         mmlu_score: null,
         mt_bench: null,
@@ -387,7 +407,7 @@
         name: "Gemini Dev API",
         input_tokens_price_per_million: 0.50,
         output_tokens_price_per_million: 1.50,
-        context_length: "128000",
+        context_length: 128,
         score: 1125,
         mmlu_score: 83.7,
         mt_bench: null,
@@ -401,7 +421,7 @@
         name: "Gemini Advanced",
         input_tokens_price_per_million: null,
         output_tokens_price_per_million: null,
-        context_length: "128000",
+        context_length: 128,
         score: 1203,
         mmlu_score: null,
         mt_bench: null,
@@ -452,7 +472,7 @@ function update(xMetric, yMetric) {
 
     xScale.domain(d3.extent(filteredData, d => d[xMetric])).nice();
     yScale.domain(d3.extent(filteredData, d => d[yMetric])).nice();
-    
+    console.log(d3.extent(filteredData, d => d[yMetric]))
       axisLayer.selectAll(".x-axis").remove();
       axisLayer.append("g")
         .attr("class", "x-axis")
@@ -656,7 +676,7 @@ const texts = labelLayer.selectAll(".dot-label")
       evt.currentTarget.className += " active";
     }
   
-    update("input_tokens_price_per_million", "score");
+    update("output_tokens_price_per_million", "score");
     updateTable();
     updateLegend();
   
