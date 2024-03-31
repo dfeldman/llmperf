@@ -252,7 +252,7 @@
     </div>
 
     <div class="notification-bar">
-      Updated March 31: Added Command R and Qwen, added mobile UI
+      Updated March 31: Added Command R and Qwen, added mobile UI and FAQ
     </div>
 
     <div class="tab">
@@ -601,6 +601,22 @@
     .attr("class", "tooltip")
     .style("opacity", 0);
 
+  function addToolTip(xMetric, yMetric) {
+    return function (event, d) {
+          tooltip.transition()
+            .duration(200)
+            .style("opacity", .9);
+          tooltip.html(`
+            <strong>${d.name}</strong><br/>
+            ${formatName(xMetric)}: ${d[xMetric]}<br/>
+            ${formatName(yMetric)}: ${d[yMetric]}<br/>
+            Company: ${d.company}
+          `)
+            .style("left", (event.pageX + 10) + "px")
+            .style("top", (event.pageY - 28) + "px");
+        }
+  }
+
 function update(xMetric, yMetric) {
     const filteredData = data.filter(d => d[xMetric] !== null && d[yMetric] !== null);
 
@@ -649,19 +665,7 @@ function update(xMetric, yMetric) {
         .attr("cy", d => yScale(d[yMetric]))
         .attr("r", 6)
         .style("fill", d => colorScale(d.company))
-        .on("mouseover", function (event, d) {
-          tooltip.transition()
-            .duration(200)
-            .style("opacity", .9);
-          tooltip.html(`
-            <strong>${d.name}</strong><br/>
-            ${formatName(xMetric)}: ${d[xMetric]}<br/>
-            ${formatName(yMetric)}: ${d[yMetric]}<br/>
-            Company: ${d.company}
-          `)
-            .style("left", (event.pageX + 10) + "px")
-            .style("top", (event.pageY - 28) + "px");
-        })
+        .on("mouseover", addToolTip(xMetric, yMetric))
         .on("mouseout", function (d) {
           tooltip.transition()
             .duration(500)
@@ -669,7 +673,8 @@ function update(xMetric, yMetric) {
         })
         .on("click", function (event, d) {
           showDetailPanel(d);
-        });
+        })
+        ;
 
 // Step 1: Render the text elements
 const texts = labelLayer.selectAll(".dot-label")
@@ -681,7 +686,16 @@ const texts = labelLayer.selectAll(".dot-label")
   .text(d => d.name)
   .style("text-anchor", "middle")
   .style("font-size", "12px")
-  .style("fill", "#333");
+  .style("fill", "#333")      
+  .on("mouseover", addToolTip(xMetric, yMetric))
+      .on("mouseout", function (d) {
+          tooltip.transition()
+            .duration(500)
+            .style("opacity", 0);
+        })
+        .on("click", function (event, d) {
+          showDetailPanel(d);
+        });
 
   texts.each(function(d) {
   // Ensure accurate measurement by deferring until after render
@@ -702,7 +716,9 @@ const texts = labelLayer.selectAll(".dot-label")
       .attr("height", rectHeight)
       .attr("rx", 5) // Customize the corner radius
       .style("fill", "#ccc") // Customize the fill color
-      .attr("class", "dot-label-bg");
+      .attr("class", "dot-label-bg")
+
+      ; 
 
     // Ensure text is on top of the rect
     this.parentNode.appendChild(this);
@@ -842,7 +858,7 @@ const texts = labelLayer.selectAll(".dot-label")
     });
   
     d3.select("#yMetric").on("change", function () {
-      update(d3.select("#xMetric").property("value"), this.value);
+      update(d3.select("#xMetric").property("value"), d3.select("#yMetric").property("value"));
     });
   
     window.addEventListener("resize", resizeGraph);
