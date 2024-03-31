@@ -82,6 +82,7 @@
     .dot {
       stroke: #1d1d1f;
       cursor: pointer;
+      r: 10;
     }
 
     .dot-label {
@@ -238,7 +239,7 @@
   }
 
   .dot {
-    r: 10;
+    r: 20;
   }
   .dot-label {
     display:none;  
@@ -692,7 +693,7 @@ function update(xMetric, yMetric) {
       .join("text")
       .attr("class", "dot-label")
       .attr("x", d => xScale(d[xMetric]))
-      .attr("y", d => yScale(d[yMetric]) - 12)
+      .attr("y", d => yScale(d[yMetric]) - 22)
       .text(d => d.name)
       .style("text-anchor", "middle")
       .style("font-size", "12px")
@@ -720,7 +721,7 @@ function update(xMetric, yMetric) {
         // Insert the rect before the text element so it appears behind
         labelLayer.insert("rect",":first-child") // Ensure rects are behind all texts
           .attr("x", xPosition)
-          .attr("y", yScale(d[yMetric]) - rectHeight + (rectHeight / 4)-12) // Adjust Y position as needed
+          .attr("y", yScale(d[yMetric]) - rectHeight + (rectHeight / 4)-22) // Adjust Y position as needed
           .attr("width", rectWidth)
           .attr("height", rectHeight)
           .attr("rx", 5) // Customize the corner radius
