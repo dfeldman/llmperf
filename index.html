@@ -58,7 +58,8 @@
 
     .tabcontent {
       display: none;
-      padding: 20px;
+      padding: 10px;
+      width: 100%;
     }
 
     dt {
@@ -189,6 +190,7 @@
       width: 90%;
       height: calc(100vh - 150px);
       transition: width 0.3s;
+      width: 95%;
     }
 
     #graph.sidebar-open {
@@ -201,6 +203,7 @@
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       transition: right 0.3s;
       margin:10px;
+      width: 90%;
     }
     #footer {
       width: 100%;
@@ -585,7 +588,7 @@
   const width = 800 - margin.left - margin.right;
   const height = 600 - margin.top - margin.bottom;
   const svg = graphContainer.append("svg")
-    .attr("width", width + margin.left + margin.right)
+    .attr("width", "100%") //width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
     .append("g")
     .attr("transform", `translate(${margin.left},${margin.top})`);
@@ -618,6 +621,8 @@
   }
 
 function update(xMetric, yMetric) {
+    newWidth = graphContainer.node().getBoundingClientRect().width - margin.left - margin.right;
+    newHeight = graphContainer.node().getBoundingClientRect().height - margin.top - margin.bottom;
     const filteredData = data.filter(d => d[xMetric] !== null && d[yMetric] !== null);
 
     svg.selectAll(".axis-layer").remove();
@@ -627,7 +632,10 @@ function update(xMetric, yMetric) {
     const dotLayer = svg.append("g").attr("class", "dot-layer");
     const labelLayer = svg.append("g").attr("class", "label-layer");
 
-    xScale.domain(d3.extent(filteredData, d => d[xMetric])).nice();
+    xScaleOrig = d3.extent(filteredData, d => d[xMetric]);
+    xScaleOrig[1] = xScaleOrig[1] * 1.2;
+    xScale.domain(xScaleOrig).nice();
+    console.log("xScale domain", xScale.domain())
     yScale.domain(d3.extent(filteredData, d => d[yMetric])).nice();
     axisLayer.selectAll(".x-axis").remove();
     axisLayer.append("g")
@@ -636,7 +644,7 @@ function update(xMetric, yMetric) {
       .call(xAxis)
       .append("text")
       .attr("class", "axis-label")
-      .attr("x", (width - margin.left - margin.right) / 2)
+      .attr("x", (width - margin.left - margin.right) / 2) // this is wrong
       .attr("y", margin.bottom - 10)
       .attr("fill", "black")
       .style("text-anchor", "middle")
@@ -649,7 +657,7 @@ function update(xMetric, yMetric) {
         .append("text")
         .attr("class", "axis-label")
         .attr("transform", "rotate(-90)")
-        .attr("x", -(height - margin.top - margin.bottom) / 2)
+        .attr("x",  -(height - margin.top - margin.bottom) / 2)
         .attr("y", -margin.left + 20)
         .attr("fill", "black")
         .style("text-anchor", "middle")
@@ -820,11 +828,13 @@ const texts = labelLayer.selectAll(".dot-label")
     }
   
     function resizeGraph() {
+      
       newWidth = graphContainer.node().getBoundingClientRect().width - margin.left - margin.right;
       newHeight = graphContainer.node().getBoundingClientRect().height - margin.top - margin.bottom;
-      svg.attr("width", newWidth + margin.left + margin.right)
+      svg.attr("width", "80%") //newWidth + margin.left + margin.right)
         .attr("height", newHeight + margin.top + margin.bottom);
-
+      //svg.attr("width", "90%");
+      console.log("set width to 1000")
       svg.select("g")
         .attr("transform", `translate(${margin.left},${margin.top})`);
 
@@ -864,6 +874,8 @@ const texts = labelLayer.selectAll(".dot-label")
     window.addEventListener("resize", resizeGraph);
   
     document.getElementsByClassName("tablinks")[0].click();
+
+    resizeGraph();
   </script>
   </body>
 </html>
