@@ -22,6 +22,7 @@
       letter-spacing: 2px;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
+
     .header h1 { 
       padding: 0; 
       margin: 0;
@@ -58,6 +59,11 @@
     .tabcontent {
       display: none;
       padding: 20px;
+    }
+
+    dt {
+      font-weight: bold;
+      margin-top: 10px;
     }
 
     .axis path,
@@ -207,6 +213,37 @@
       color: white;
       text-decoration: none;
     }
+
+  @media screen and (max-width: 1000px) {
+  .select {
+    font-size: 18px;
+    padding: 10px;
+  }
+
+  .detail-panel {
+    position: fixed;
+    top: 20;
+    left: 0;
+    width: 93%;
+    height: 70%;
+    overflow-y: auto;
+    z-index: 9999;
+    display: none; 
+  }
+
+  .dot {
+    r: 10;
+  }
+  .dot-label {
+    display:none;  
+  }
+  .dot-label-bg {
+    display: none;
+  }
+  .axis-label {
+    font-size: 18px;
+  }
+}
   </style>
   </head>
   <body>
@@ -215,14 +252,13 @@
     </div>
 
     <div class="notification-bar">
-      Updates: Added Haiku
+      Updated March 31: Added Command R and Qwen, added mobile UI
     </div>
 
     <div class="tab">
       <button class="tablinks" onclick="openTab(event, 'graph')">Graph</button>
       <button class="tablinks" onclick="openTab(event, 'table')">Table</button>
-      <button class="tablinks" onclick="openTab(event, 'openModels')">Open
-        Models</button>
+      <button class="tablinks" onclick="openTab(event, 'faq')">FAQ</button>
     </div>
 
     <div id="graph" class="tabcontent">
@@ -272,6 +308,8 @@
             <th>MT-Bench</th>
             <th>GPQA</th>
             <th>HumanEval (Coding)</th>
+            <th>Release Date</th>
+            <th>Knowledge Cutoff Date</th>
           </tr>
         </thead>
         <tbody>
@@ -281,9 +319,45 @@
 
     </div>
 
-    <div id="openModels" class="tabcontent">
-      <h2>Open Models</h2>
-      <p>This section is currently under development.</p>
+    <div id="faq" class="tabcontent">
+      <h2>FAQ</h2>
+      <dl>
+        <dt>What is an LLM?</dt>
+        <dd>LLM stands for Large Language Model, which is a type of artificial intelligence that understands and generates human-like text based on the input it receives. LLMs are trained on vast datasets of human language and can perform a wide range of language-related tasks.</dd>
+
+        <dt>Why do you display obsolete models?</dt>
+        <dd>We display obsolete models to provide a comprehensive historical context and enable performance comparisons over time. This helps users understand the evolution of LLM technology and its capabilities.</dd>
+
+        <dt>Why don't you display very old models?</dt>
+        <dd>Very old models are omitted to maintain the relevance and clarity of our benchmarks. Including them might clutter the data and make it harder for users to find useful information about current and recently obsolete models.</dd>
+
+        <dt>How do you gather pricing information for open models?</dt>
+        <dd>For the open models, you can download and run the weights yourself for free -- but you probably will not due to the very expensive GPUs required. Instead, this site shows prices from together.ai, a low-cost service that hosts open models for you.</dd>
+
+        <dt>What is context length?</dt>
+        <dd>Context length refers to the maximum number of tokens an LLM can process in a single prompt. A token can be a word, part of a word, or even punctuation, depending on the model's training data and tokenization method. This parameter is crucial as it affects the model's ability to understand and generate coherent and contextually relevant responses.</dd>
+
+        <dt>What are the metrics shown?</dt>
+        <dd>The metrics displayed on our site include Chatbot Arena ELO, MMLU (Massive Multitask Language Understanding), MT-Bench (Machine Translation Benchmark), GPQA (General Purpose Question Answering), and HumanEval. These metrics are used to evaluate the performance of LLMs across different tasks and capabilities.</dd>
+
+        <dt>How often is the data updated?</dt>
+        <dd>The data is updated approximately once a week. This frequency ensures that our benchmarks remain up-to-date and reflect the latest developments and improvements in LLM technology.</dd>
+
+        <dt>Why is Grok not included?</dt>
+        <dd>We don't yet have any benchmark data for Grok.</dd>
+
+        <dt>Which metric is best for my application?</dt>
+        <dd>The best metric for your application depends on the specific tasks you intend to use the LLM for. 
+            <ul>
+                <li><strong>Chatbot Arena ELO:</strong> This is a human-rated score on answering a variety of chatbot-like questions. The ChatBot Arena is <a href="https://huggingface.co/spaces/lmsys/chatbot-arena-leaderboard">here.</a></li>
+                <li><strong>MMLU:</strong> MMLU is a very large database of school-test-like multiple choice questions, similar to what an undergraduate student might learn. Try it <a href="https://d.erenrich.net/are-you-smarter-than-an-llm/index.html">here</a>.</li>
+                <li><strong>MT-Bench:</strong> MT-Bench is a benchmark for "multi-turn" chats (conversations involving back-and-forth). A description is <a href="https://klu.ai/glossary/mt-bench-eval">here</a>.</li>
+                <li><strong>GPQA:</strong>GPQA is an extraordinarily challenging multiple-choice question database similar to what an advanced graduate student or scientific expert might learn. Learn more about it <a href="https://github.com/idavidrein/gpqa"> here</a>.</li>
+                <li><strong>HumanEval:</strong> HumanEval is a code generation benchmark that pairs questions in 23 natural languages with 12 different programming languages. The benchmark asks a question in a natural language; gets a small piece of code; and runs it to verify functionality.</li>
+            </ul>
+            Consider your application's primary function and choose a metric that aligns with the skills necessary for optimal performance.
+        </dd>
+    </dl>
     </div>
 
     <div id="footer">
@@ -307,7 +381,9 @@
         human_eval: 75,
         company: "Anthropic",
         description: "Claude 3 Haiku is a powerful language model developed by Anthropic, offering high-quality text generation with a context length of 200K tokens.",
-        companyWebsite: "https://www.anthropic.com"
+        companyWebsite: "https://www.anthropic.com",
+        release: "2024-03-14",
+        cutoff: "2023-08-01"
       },
       {
         name: "Claude 3 Sonnet",
@@ -321,7 +397,9 @@
         human_eval: 73,
         company: "Anthropic",
         description: "Claude 3 Sonnet is another impressive language model by Anthropic, providing excellent performance for various natural language tasks with a context length of 200K tokens.",
-        companyWebsite: "https://www.anthropic.com"
+        companyWebsite: "https://www.anthropic.com",
+        release: "2024-03-14",
+        cutoff: "2023-08-01"
       },
       {
         name: "Claude 3 Opus",
@@ -335,10 +413,12 @@
         human_eval: 84.9,
         company: "Anthropic",
         description: "Claude 3 Opus is the most advanced language model in the Claude 3 series by Anthropic, delivering top-notch performance with a context length of 200K tokens.",
-        companyWebsite: "https://www.anthropic.com"
+        companyWebsite: "https://www.anthropic.com",
+        release: "2024-03-14",
+        cutoff: "2023-08-01"
       },
       {
-        name: "GPT-4 Turbo (128k context)",
+        name: "GPT-4 Turbo",
         input_tokens_price_per_million: 10,
         output_tokens_price_per_million: 30,
         context_length: 128,
@@ -349,7 +429,9 @@
         human_eval: 74.5,
         company: "OpenAI",
         description: "GPT-4 Turbo is a high-performance language model by OpenAI, offering a context length of 128K tokens for efficient and accurate text generation.",
-        companyWebsite: "https://www.openai.com"
+        companyWebsite: "https://www.openai.com",
+        cutoff: "2023-04-01",
+        release: "202-06-13"
       },
       {
         name: "GPT-4",
@@ -362,8 +444,10 @@
         gpqa: 35.7,
         human_eval: 74.5,
         company: "OpenAI",
-        description: "GPT-4 is the latest groundbreaking language model by OpenAI, providing exceptional performance with context lengths of 8K and 32K tokens.",
-        companyWebsite: "https://www.openai.com"
+        description: "GPT-4 is the original, now-deprecated version of GPT-4. New users should switch to GPT-4 Turbo.",
+        companyWebsite: "https://www.openai.com",
+        release: "2023-03-14",
+        cutoff: "2021-09-01",
       },
       {
         name: "GPT-3.5 Turbo 0613",
@@ -377,7 +461,9 @@
         human_eval: null,
         company: "OpenAI",
         description: "GPT-3.5 Turbo 0613 is a powerful language model by OpenAI, offering a context length of 16K tokens for efficient and high-quality text generation.",
-        companyWebsite: "https://www.openai.com"
+        companyWebsite: "https://www.openai.com",
+        release: "2023-06-13",
+        cutoff: "2021-09-01"
       },
       {
         name: "Mistral Medium",
@@ -391,7 +477,9 @@
         human_eval: null,
         company: "Mistral",
         description: "Mistral Medium is a language model developed by Mistral, offering a context length of 8K tokens for various natural language tasks.",
-        companyWebsite: ""
+        companyWebsite: "http://mistral.ai",
+        release: "2024-02-25",
+
       },
       {
         name: "Mistral Large",
@@ -405,7 +493,9 @@
         human_eval: null,
         company: "Mistral",
         description: "Mistral Large is a more advanced language model by Mistral, delivering improved performance with a context length of 32K tokens.",
-        companyWebsite: ""
+        companyWebsite: "http://mistral.ai",
+        release: "2024-02-25",
+        cutoff: "2022-12-01"
       },
       {
         name: "Gemini Dev API",
@@ -419,10 +509,12 @@
         human_eval: 74.4,
         company: "Google",
         description: "Gemini Dev API is a language model offered by Google, providing a context length of 128K tokens for various natural language processing tasks.",
-        companyWebsite: "https://www.google.com"
+        companyWebsite: "https://www.google.com",
+        release: "2024-02-15",
+        cutoff: "2023-04-01",
       },
       {
-        name: "Gemini Advanced",
+        name: "Gemini Pro (Bard)",
         input_tokens_price_per_million: null,
         output_tokens_price_per_million: null,
         context_length: 128,
@@ -433,11 +525,61 @@
         human_eval: null,
         company: "Google",
         description: "Gemini Advanced is a high-performance language model by Google, offering a context length of 128K tokens for advanced natural language applications.",
-        companyWebsite: "https://www.google.com"
+        companyWebsite: "https://www.google.com",
+        release: "Unknown",
+        cutoff: "Online"
       },
+      {
+        name: "Qwen1.5-72B-Chat",
+        input_tokens_price_per_million: 0.90, 
+        output_tokens_price_per_million: 0.90,
+        context_length: 32,
+        score: 1149,
+        mmlu_score: 77.5,
+        human_eval: 42.5,
+        mt_bench: 8.61,
+        company: "Alibaba (Open)",
+        description: "Qwen1.5-72B-Chat is a high-performance open language model by Alibaba.",
+        companyWebsite: "https://qwenlm.github.io/blog/qwen1.5/",
+        cutoff: "2024-02-01",
+        release: "2024-02-04"
+      },
+      {
+        name: "Command R",
+        input_tokens_price_per_million: 0.90,
+        output_tokens_price_per_million: 0.90,
+        score: 1146,
+        company: "Cohere (Open)",
+        description: "Command R is an open model intended specifically for retrieval-augemented generation (RAG) tasks.",
+        companyWebsite: "https://cohere.ai",
+        cutoff: "2024-03-11"
+      }
     ];
   
-  
+    function formatName(internalName) {
+      switch (internalName) {
+        case "output_tokens_price_per_million":
+          return "Output Tokens Price per Million (USD)";
+        case "input_tokens_price_per_million":
+          return "Input Tokens Price per Million (USD)";
+        case "score":
+          return "Chatbot Arena ELO";
+        case "mmlu_score":
+          return "MMLU Score";
+        case "mt_bench":
+          return "MT-Bench";
+        case "context_length":
+          return "Context Length";
+        case "gpqa":
+          return "GPQA";
+        case "human_eval":
+          return "HumanEval (Coding)";
+        default:
+          return internalName;
+      }
+  }
+
+
   const graphContainer = d3.select("#graphCore");
   const margin = { top: 40, right: 20, bottom: 60, left: 60 };
   const width = 800 - margin.left - margin.right;
@@ -459,12 +601,7 @@
     .attr("class", "tooltip")
     .style("opacity", 0);
 
-
-
-
-
 function update(xMetric, yMetric) {
-    console.log("update");
     const filteredData = data.filter(d => d[xMetric] !== null && d[yMetric] !== null);
 
     svg.selectAll(".axis-layer").remove();
@@ -476,19 +613,18 @@ function update(xMetric, yMetric) {
 
     xScale.domain(d3.extent(filteredData, d => d[xMetric])).nice();
     yScale.domain(d3.extent(filteredData, d => d[yMetric])).nice();
-    console.log(d3.extent(filteredData, d => d[yMetric]))
-      axisLayer.selectAll(".x-axis").remove();
-      axisLayer.append("g")
-        .attr("class", "x-axis")
-        .attr("transform", `translate(0,${height})`)
-        .call(xAxis)
-        .append("text")
-        .attr("class", "axis-label")
-        .attr("x", (width - margin.left - margin.right) / 2)
-        .attr("y", margin.bottom - 10)
-        .attr("fill", "black")
-        .style("text-anchor", "middle")
-        .text(xMetric);
+    axisLayer.selectAll(".x-axis").remove();
+    axisLayer.append("g")
+      .attr("class", "x-axis")
+      .attr("transform", `translate(0,${height})`)
+      .call(xAxis)
+      .append("text")
+      .attr("class", "axis-label")
+      .attr("x", (width - margin.left - margin.right) / 2)
+      .attr("y", margin.bottom - 10)
+      .attr("fill", "black")
+      .style("text-anchor", "middle")
+      .text(formatName(xMetric));
 
       axisLayer.selectAll(".y-axis").remove();
       axisLayer.append("g")
@@ -502,7 +638,7 @@ function update(xMetric, yMetric) {
         .attr("fill", "black")
         .style("text-anchor", "middle")
         .style("z-index", "-1000")
-        .text(yMetric);
+        .text(formatName(yMetric));
       dotLayer.selectAll(".dot").remove();
       dotLayer.selectAll().remove();
       dotLayer.selectAll(".dot")
@@ -519,8 +655,8 @@ function update(xMetric, yMetric) {
             .style("opacity", .9);
           tooltip.html(`
             <strong>${d.name}</strong><br/>
-            ${xMetric}: ${d[xMetric]}<br/>
-            ${yMetric}: ${d[yMetric]}<br/>
+            ${formatName(xMetric)}: ${d[xMetric]}<br/>
+            ${formatName(yMetric)}: ${d[yMetric]}<br/>
             Company: ${d.company}
           `)
             .style("left", (event.pageX + 10) + "px")
@@ -595,7 +731,9 @@ const texts = labelLayer.selectAll(".dot-label")
           d.mmlu_score,
           d.mt_bench,
           d.gpqa,
-          d.human_eval
+          d.human_eval,
+          d.release,
+          d.cutoff,
         ])
         .join("td")
         .html(d => d);
@@ -633,37 +771,52 @@ const texts = labelLayer.selectAll(".dot-label")
   
       Object.entries(d).forEach(([key, value]) => {
         if (key !== "name" && key !== "description" && key !== "company" && key !== "companyWebsite") {
+          formattedName = formatName(key)
+          if (value === null) {
+            value = "";
+          }
           statsTable.append("tr")
-            .html(`<td>${key}</td><td>${value}</td>`);
+            .html(`<td>${formattedName}</td><td>${value}</td>`);
         }
       });
   
       d3.select("#detailPanel").classed("show", true);
       graphContainer.classed("sidebar-open", true);
+
+      if (window.innerWidth <= 1000) {
+        graphContainer.style("display", "none");
+      } else {
+        graphContainer.classed("sidebar-open", true);
+      }
+
+      d3.select("#detailPanel").style("display", "block");
       resizeGraph();
     }
   
     function closeDetailPanel() {
       d3.select("#detailPanel").classed("show", false);
+      d3.select("#detailPanel").style("display", "none");
+
       graphContainer.classed("sidebar-open", false);
+
+      graphContainer.style("display", "block");
       resizeGraph();
     }
   
     function resizeGraph() {
-    width = graphContainer.node().getBoundingClientRect().width - margin.left - margin.right;
-    height = graphContainer.node().getBoundingClientRect().height - margin.top - margin.bottom;
+      newWidth = graphContainer.node().getBoundingClientRect().width - margin.left - margin.right;
+      newHeight = graphContainer.node().getBoundingClientRect().height - margin.top - margin.bottom;
+      svg.attr("width", newWidth + margin.left + margin.right)
+        .attr("height", newHeight + margin.top + margin.bottom);
 
-    svg.attr("width", width + margin.left + margin.right)
-      .attr("height", height + margin.top + margin.bottom);
+      svg.select("g")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    svg.select("g")
-      .attr("transform", `translate(${margin.left},${margin.top})`);
+      xScale.range([0, newWidth]);
+      yScale.range([newHeight, 0]);
 
-    xScale.range([0, width]);
-    yScale.range([height, 0]);
-
-    update(d3.select("#xMetric").property("value"), d3.select("#yMetric").property("value"));
-  }
+      update(d3.select("#xMetric").property("value"), d3.select("#yMetric").property("value"));
+    }
   
     function openTab(evt, tabName) {
       const tabcontent = document.getElementsByClassName("tabcontent");
