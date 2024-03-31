@@ -555,6 +555,7 @@
         input_tokens_price_per_million: 0.90,
         output_tokens_price_per_million: 0.90,
         score: 1146,
+        context_length: 32,
         company: "Cohere (Open)",
         description: "Command R is an open model intended specifically for retrieval-augemented generation (RAG) tasks.",
         companyWebsite: "https://cohere.ai",
@@ -626,7 +627,8 @@
 function update(xMetric, yMetric) {
     newWidth = graphContainer.node().getBoundingClientRect().width - margin.left - margin.right;
     newHeight = graphContainer.node().getBoundingClientRect().height - margin.top - margin.bottom;
-    const filteredData = data.filter(d => d[xMetric] !== null && d[yMetric] !== null);
+    const filteredData = data.filter(d => d[xMetric] !== null && d[yMetric] !== null && d[xMetric] !== undefined && d[yMetric] !== undefined);
+
 
     svg.selectAll(".axis-layer").remove();
     svg.selectAll(".dot-layer").remove();
@@ -638,7 +640,6 @@ function update(xMetric, yMetric) {
     xScaleOrig = d3.extent(filteredData, d => d[xMetric]);
     xScaleOrig[1] = xScaleOrig[1] * 1.2;
     xScale.domain(xScaleOrig).nice();
-    console.log("xScale domain", xScale.domain())
     yScale.domain(d3.extent(filteredData, d => d[yMetric])).nice();
     axisLayer.selectAll(".x-axis").remove();
     axisLayer.append("g")
@@ -686,50 +687,47 @@ function update(xMetric, yMetric) {
           showDetailPanel(d);
         })
         ;
+    const texts = labelLayer.selectAll(".dot-label")
+      .data(filteredData)
+      .join("text")
+      .attr("class", "dot-label")
+      .attr("x", d => xScale(d[xMetric]))
+      .attr("y", d => yScale(d[yMetric]) - 12)
+      .text(d => d.name)
+      .style("text-anchor", "middle")
+      .style("font-size", "12px")
+      .style("fill", "#333")      
+      .on("mouseover", addToolTip(xMetric, yMetric))
+          .on("mouseout", function (d) {
+              tooltip.transition()
+                .duration(500)
+                .style("opacity", 0);
+            })
+            .on("click", function (event, d) {
+              showDetailPanel(d);
+            });
 
-// Step 1: Render the text elements
-const texts = labelLayer.selectAll(".dot-label")
-  .data(filteredData)
-  .join("text")
-  .attr("class", "dot-label")
-  .attr("x", d => xScale(d[xMetric]))
-  .attr("y", d => yScale(d[yMetric]) - 12)
-  .text(d => d.name)
-  .style("text-anchor", "middle")
-  .style("font-size", "12px")
-  .style("fill", "#333")      
-  .on("mouseover", addToolTip(xMetric, yMetric))
-      .on("mouseout", function (d) {
-          tooltip.transition()
-            .duration(500)
-            .style("opacity", 0);
-        })
-        .on("click", function (event, d) {
-          showDetailPanel(d);
-        });
+    texts.each(function(d) {
+      // Ensure accurate measurement by deferring until after render
+      setTimeout(() => {
+        const textWidth = this.getComputedTextLength();
+        const padding = 10; // Adjust padding around text
+        const rectHeight = 20; // Set your desired rect height
 
-  texts.each(function(d) {
-  // Ensure accurate measurement by deferring until after render
-  setTimeout(() => {
-    const textWidth = this.getComputedTextLength();
-    const padding = 10; // Adjust padding around text
-    const rectHeight = 20; // Set your desired rect height
+        // Adjust x position to center the rect behind the text
+        const xPosition = xScale(d[xMetric]) - (textWidth / 2) - (padding / 2);
+        const rectWidth = textWidth + padding;
+        // Insert the rect before the text element so it appears behind
+        labelLayer.insert("rect",":first-child") // Ensure rects are behind all texts
+          .attr("x", xPosition)
+          .attr("y", yScale(d[yMetric]) - rectHeight + (rectHeight / 4)-12) // Adjust Y position as needed
+          .attr("width", rectWidth)
+          .attr("height", rectHeight)
+          .attr("rx", 5) // Customize the corner radius
+          .style("fill", "#ccc") // Customize the fill color
+          .attr("class", "dot-label-bg")
 
-    // Adjust x position to center the rect behind the text
-    const xPosition = xScale(d[xMetric]) - (textWidth / 2) - (padding / 2);
-    const rectWidth = textWidth + padding;
-
-    // Insert the rect before the text element so it appears behind
-    labelLayer.insert("rect",":first-child") // Ensure rects are behind all texts
-      .attr("x", xPosition)
-      .attr("y", yScale(d[yMetric]) - rectHeight + (rectHeight / 4)-12) // Adjust Y position as needed
-      .attr("width", rectWidth)
-      .attr("height", rectHeight)
-      .attr("rx", 5) // Customize the corner radius
-      .style("fill", "#ccc") // Customize the fill color
-      .attr("class", "dot-label-bg")
-
-      ; 
+        ; 
 
     // Ensure text is on top of the rect
     this.parentNode.appendChild(this);
@@ -836,8 +834,6 @@ const texts = labelLayer.selectAll(".dot-label")
       newHeight = graphContainer.node().getBoundingClientRect().height - margin.top - margin.bottom;
       svg.attr("width", "80%") //newWidth + margin.left + margin.right)
         .attr("height", newHeight + margin.top + margin.bottom);
-      //svg.attr("width", "90%");
-      console.log("set width to 1000")
       svg.select("g")
         .attr("transform", `translate(${margin.left},${margin.top})`);
 
