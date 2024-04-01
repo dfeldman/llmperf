@@ -435,7 +435,7 @@
           This is particularly a problem for MMLU, since the questions and answers are widely available. 
           MT-Bench and HumanEval mitigate this by using automatically-generated questions, and GPQA mitigates this
           by not publicly releasing the correct answers. However, at least in theory, a model could be excessively
-          fine-tuned for these bencmarks. </p>
+          fine-tuned for these benchmarks. </p>
         </dd>
       </dl>
     </div>
@@ -815,8 +815,9 @@ function update(xMetric, yMetric) {
           height: rectHeight,
         };
       });
-      adjustLabels(labelData);
 
+      adjustLabels(labelData);
+      
       // DRAW LABEL BACKGROUNDS
       const labelRects = labelLayer.selectAll(".dot-label-rect")
         .data(labelData)
@@ -855,6 +856,13 @@ function update(xMetric, yMetric) {
     
     }
   
+    function nanToSmall(i) {
+      if (isNaN(i)) {
+        return 0.1;
+      } else {
+        return i; 
+      }
+    }
     function adjustLabels(labelData) {
       const maxIterations = 500;
       let iteration = 0;
@@ -863,6 +871,7 @@ function update(xMetric, yMetric) {
       while (overlaps && iteration < maxIterations) {
         overlaps = false;
         for (let i = 0; i < labelData.length - 1; i++) {
+
           const label1 = labelData[i];
 
           for (let j = i + 1; j < labelData.length; j++) {
@@ -872,15 +881,16 @@ function update(xMetric, yMetric) {
               const dx = label2.x - label1.x;
               const dy = label2.y - label1.y;
               const distance = Math.sqrt(dx * dx + dy * dy);
-              const overlap = (label1.width + label2.width) / 2 - distance;
-              const adjustmentX = (dx / distance) * overlap * (0.2);
-              const adjustmentY = (dy / distance) * overlap * (0.2);
+              const overlap = nanToSmall((label1.width + label2.width) / 2 - distance);
+              const adjustmentX = nanToSmall(dx / distance) * overlap * (0.2);
+              const adjustmentY = nanToSmall(dy / distance) * overlap * (0.2);
               label1.x -= adjustmentX;
               label1.y -= adjustmentY;
               label2.x += adjustmentX;
               label2.y += adjustmentY;
             }
           }
+          //console.log("first pass end",labelData[i].data.name, labelData[i].x, labelData[i].y)
         }
 
         iteration++;
@@ -891,7 +901,6 @@ function update(xMetric, yMetric) {
         if (prevPositions[index]) {
           const distanceThreshold = 10; // Adjust this value as needed
 
-
           const prevX = prevPositions[index].x;
           const prevY = prevPositions[index].y;
           // Calculate the distance between the current and previous positions
@@ -899,10 +908,12 @@ function update(xMetric, yMetric) {
 
           // If the distance is within the threshold, use the previous position
           if (distance < distanceThreshold) {
-            console.log("Using previous position")
+            //console.log("Switch back to previous position", label.x, label.y, prevX, prevY)
             label.x = prevX;
             label.y = prevY;
           }
+        } else {
+          //console.log("No previous position found")
         }
       });
     
