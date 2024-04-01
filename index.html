@@ -384,8 +384,8 @@
 
         <dt>What are the metrics shown?</dt>
         <dd>The metrics displayed on our site include Chatbot Arena ELO, MMLU
-          (Massive Multitask Language Understanding), MT-Bench (Machine
-          Translation Benchmark), GPQA (General Purpose Question Answering), and
+          (Massive Multitask Language Understanding), MT-Bench (Multi-turn Benchmark), 
+          GPQA (Google-proof Question and Answer), and
           HumanEval. These metrics are used to evaluate the performance of LLMs
           across different tasks and capabilities.</dd>
 
@@ -402,7 +402,8 @@
           you intend to use the LLM for.
           <ul>
             <li><strong>Chatbot Arena ELO:</strong> This is a human-rated score
-              on answering a variety of chatbot-like questions. The ChatBot
+              where the human asks two randomly-chosen LLMs the same question and chooses the superior
+              answer. The ChatBot
               Arena is <a
                 href="https://huggingface.co/spaces/lmsys/chatbot-arena-leaderboard">here.</a></li>
             <li><strong>MMLU:</strong> MMLU is a very large database of
@@ -424,8 +425,17 @@
               a natural language; gets a small piece of code; and runs it to
               verify functionality.</li>
           </ul>
-          Consider your application's primary function and choose a metric that
-          aligns with the skills necessary for optimal performance.
+          <p>For many applications, Chatbot Arena ELO is the best metric to use, since it cannot
+          be trained for in advance and is evaluated by humans and an independent organization. 
+          One downside of Chatbot Arena is that humans typically favor longer responses, even if a shorter
+          response is equally correct. The highest-scoring models on Chatbot Arena do tend to produce long responses. </p>
+
+          <p>MMLU, MT-Bench, HumanEval, and GPQA are automatically evaluated, so they are not biased by long answers. 
+          The risk with these four benchmarks is that correct answers might leak into training data. 
+          This is particularly a problem for MMLU, since the questions and answers are widely available. 
+          MT-Bench and HumanEval mitigate this by using automatically-generated questions, and GPQA mitigates this
+          by not publicly releasing the correct answers. However, at least in theory, a model could be excessively
+          fine-tuned for these bencmarks. </p>
         </dd>
       </dl>
     </div>
@@ -647,6 +657,10 @@
           return "GPQA";
         case "human_eval":
           return "HumanEval (Coding)";
+        case "release":
+          return "Release Date"
+        case "cutoff":
+          return "Knowledge Cutoff Date"
         default:
           return internalName;
       }
