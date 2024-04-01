@@ -237,32 +237,43 @@
     font-size: 30px;
   }
 
-  @media screen and (max-width: 1000px) {
+  @media screen and (max-width: 1200px) {
+    .detail-panel {
+      position: fixed;
+      top: 20;
+      left: 0;
+      width: 93%;
+      height: 70%;
+      overflow-y: auto;
+      z-index: 9999;
+      display: none; 
+    }
 
-  .detail-panel {
-    position: fixed;
-    top: 20;
-    left: 0;
-    width: 93%;
-    height: 70%;
-    overflow-y: auto;
-    z-index: 9999;
-    display: none; 
+    .dot {
+      r: 15;
+    }
+    .dot-label {
+      display:none;  
+    }
+    .dot-label-bg {
+      display: none;
+    }
+    .axis-label {
+      font-size: 18px;
+    }
   }
-
-  .dot {
-    r: 20;
+  /* bigger dots on mobile */
+  @media (pointer: coarse)  {
+    .dot {
+      r: 30;
+    }
+    .dot-label {
+      display:none;  
+    }
+    .dot-label-bg {
+      display: none;
+    }
   }
-  .dot-label {
-    display:none;  
-  }
-  .dot-label-bg {
-    display: none;
-  }
-  .axis-label {
-    font-size: 18px;
-  }
-}
   </style>
   </head>
   <body>
@@ -341,49 +352,92 @@
       <h2>FAQ</h2>
       <dl>
         <dt>What is an LLM?</dt>
-        <dd>LLM stands for Large Language Model, which is a type of artificial intelligence that understands and generates human-like text based on the input it receives. LLMs are trained on vast datasets of human language and can perform a wide range of language-related tasks.</dd>
+        <dd>LLM stands for Large Language Model, which is a type of artificial
+          intelligence that understands and generates human-like text based on
+          the input it receives. LLMs are trained on vast datasets of human
+          language and can perform a wide range of language-related tasks.</dd>
 
         <dt>Why do you display obsolete models?</dt>
-        <dd>We display obsolete models to provide a comprehensive historical context and enable performance comparisons over time. This helps users understand the evolution of LLM technology and its capabilities.</dd>
+        <dd>We display obsolete models to provide a comprehensive historical
+          context and enable performance comparisons over time. This helps users
+          understand the evolution of LLM technology and its capabilities.</dd>
 
         <dt>Why don't you display very old models?</dt>
-        <dd>Very old models are omitted to maintain the relevance and clarity of our benchmarks. Including them might clutter the data and make it harder for users to find useful information about current and recently obsolete models.</dd>
+        <dd>Very old models are omitted to maintain the relevance and clarity of
+          our benchmarks. Including them might clutter the data and make it
+          harder for users to find useful information about current and recently
+          obsolete models.</dd>
 
         <dt>How do you gather pricing information for open models?</dt>
-        <dd>For the open models, you can download and run the weights yourself for free -- but you probably will not due to the very expensive GPUs required. Instead, this site shows prices from together.ai, a low-cost service that hosts open models for you.</dd>
+        <dd>For the open models, you can download and run the weights yourself
+          for free -- but you probably will not due to the very expensive GPUs
+          required. Instead, this site shows prices from together.ai, a low-cost
+          service that hosts open models for you.</dd>
 
         <dt>What is context length?</dt>
-        <dd>Context length refers to the maximum number of tokens an LLM can process in a single prompt. A token can be a word, part of a word, or even punctuation, depending on the model's training data and tokenization method. This parameter is crucial as it affects the model's ability to understand and generate coherent and contextually relevant responses.</dd>
+        <dd>Context length refers to the maximum number of tokens an LLM can
+          process in a single prompt. A token can be a word, part of a word, or
+          even punctuation, depending on the model's training data and
+          tokenization method. This parameter is crucial as it affects the
+          model's ability to understand and generate coherent and contextually
+          relevant responses.</dd>
 
         <dt>What are the metrics shown?</dt>
-        <dd>The metrics displayed on our site include Chatbot Arena ELO, MMLU (Massive Multitask Language Understanding), MT-Bench (Machine Translation Benchmark), GPQA (General Purpose Question Answering), and HumanEval. These metrics are used to evaluate the performance of LLMs across different tasks and capabilities.</dd>
+        <dd>The metrics displayed on our site include Chatbot Arena ELO, MMLU
+          (Massive Multitask Language Understanding), MT-Bench (Machine
+          Translation Benchmark), GPQA (General Purpose Question Answering), and
+          HumanEval. These metrics are used to evaluate the performance of LLMs
+          across different tasks and capabilities.</dd>
 
         <dt>How often is the data updated?</dt>
-        <dd>The data is updated approximately once a week. This frequency ensures that our benchmarks remain up-to-date and reflect the latest developments and improvements in LLM technology.</dd>
+        <dd>The data is updated approximately once a week. This frequency
+          ensures that our benchmarks remain up-to-date and reflect the latest
+          developments and improvements in LLM technology.</dd>
 
         <dt>Why is Grok not included?</dt>
         <dd>We don't yet have any benchmark data for Grok.</dd>
 
         <dt>Which metric is best for my application?</dt>
-        <dd>The best metric for your application depends on the specific tasks you intend to use the LLM for. 
-            <ul>
-                <li><strong>Chatbot Arena ELO:</strong> This is a human-rated score on answering a variety of chatbot-like questions. The ChatBot Arena is <a href="https://huggingface.co/spaces/lmsys/chatbot-arena-leaderboard">here.</a></li>
-                <li><strong>MMLU:</strong> MMLU is a very large database of school-test-like multiple choice questions, similar to what an undergraduate student might learn. Try it <a href="https://d.erenrich.net/are-you-smarter-than-an-llm/index.html">here</a>.</li>
-                <li><strong>MT-Bench:</strong> MT-Bench is a benchmark for "multi-turn" chats (conversations involving back-and-forth). A description is <a href="https://klu.ai/glossary/mt-bench-eval">here</a>.</li>
-                <li><strong>GPQA:</strong>GPQA is an extraordinarily challenging multiple-choice question database similar to what an advanced graduate student or scientific expert might learn. Learn more about it <a href="https://github.com/idavidrein/gpqa"> here</a>.</li>
-                <li><strong>HumanEval:</strong> HumanEval is a code generation benchmark that pairs questions in 23 natural languages with 12 different programming languages. The benchmark asks a question in a natural language; gets a small piece of code; and runs it to verify functionality.</li>
-            </ul>
-            Consider your application's primary function and choose a metric that aligns with the skills necessary for optimal performance.
+        <dd>The best metric for your application depends on the specific tasks
+          you intend to use the LLM for.
+          <ul>
+            <li><strong>Chatbot Arena ELO:</strong> This is a human-rated score
+              on answering a variety of chatbot-like questions. The ChatBot
+              Arena is <a
+                href="https://huggingface.co/spaces/lmsys/chatbot-arena-leaderboard">here.</a></li>
+            <li><strong>MMLU:</strong> MMLU is a very large database of
+              school-test-like multiple choice questions, similar to what an
+              undergraduate student might learn. Try it <a
+                href="https://d.erenrich.net/are-you-smarter-than-an-llm/index.html">here</a>.</li>
+            <li><strong>MT-Bench:</strong> MT-Bench is a benchmark for
+              "multi-turn" chats (conversations involving back-and-forth). A
+              description is <a
+                href="https://klu.ai/glossary/mt-bench-eval">here</a>.</li>
+            <li><strong>GPQA:</strong>GPQA is an extraordinarily challenging
+              multiple-choice question database similar to what an advanced
+              graduate student or scientific expert might learn. Learn more
+              about it <a href="https://github.com/idavidrein/gpqa">
+                here</a>.</li>
+            <li><strong>HumanEval:</strong> HumanEval is a code generation
+              benchmark that pairs questions in 23 natural languages with 12
+              different programming languages. The benchmark asks a question in
+              a natural language; gets a small piece of code; and runs it to
+              verify functionality.</li>
+          </ul>
+          Consider your application's primary function and choose a metric that
+          aligns with the skills necessary for optimal performance.
         </dd>
-    </dl>
+      </dl>
     </div>
 
     <div id="footer">
-    <h3>
-      <a href="https://github.com/dfeldman/llmperf" target="_blank">
-        <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub Link" style="width: 32px; height: 32px;"> Edit on GitHub
-      </a>
-    </h3>
+      <h3>
+        <a href="https://github.com/dfeldman/llmperf" target="_blank">
+          <img
+            src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
+            alt="GitHub Link" style="width: 32px; height: 32px;"> Edit on GitHub
+        </a>
+      </h3>
     </div>
     <script>
     const data = [
@@ -616,12 +670,19 @@
   const xAxis = d3.axisBottom(xScale);
   const yAxis = d3.axisLeft(yScale);
 
+  let labelData = [];
+  let lastYMetric = "";
+  let lastXMetric = "";
+  let prevPositions = {};
   const tooltip = d3.select("body").append("div")
     .attr("class", "tooltip")
     .style("opacity", 0);
 
   function addToolTip(xMetric, yMetric) {
     return function (event, d) {
+      if (d.data) {
+        d = d.data;
+      }
           tooltip.transition()
             .duration(200)
             .style("opacity", .9);
@@ -636,12 +697,20 @@
         }
   }
 
+function getTextWidth(text) {
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d");
+  context.font = "12px sans-serif"; // Specify the font style and size
+  const width = context.measureText(text).width;
+  return width;
+}
+
 function update(xMetric, yMetric) {
     newWidth = graphContainer.node().getBoundingClientRect().width - margin.left - margin.right;
     newHeight = graphContainer.node().getBoundingClientRect().height - margin.top - margin.bottom;
     const filteredData = data.filter(d => d[xMetric] !== null && d[yMetric] !== null && d[xMetric] !== undefined && d[yMetric] !== undefined);
 
-
+    // DRAW AXES
     svg.selectAll(".axis-layer").remove();
     svg.selectAll(".dot-layer").remove();
     svg.selectAll(".label-layer").remove();
@@ -681,6 +750,8 @@ function update(xMetric, yMetric) {
         .text(formatName(yMetric));
       dotLayer.selectAll(".dot").remove();
       dotLayer.selectAll().remove();
+
+      // DRAW DOTS
       dotLayer.selectAll(".dot")
         .data(filteredData)
         .join("circle")
@@ -692,64 +763,146 @@ function update(xMetric, yMetric) {
         .on("mouseover", addToolTip(xMetric, yMetric))
         .on("mouseout", function (d) {
           tooltip.transition()
-            .duration(500)
+            .duration(1200)
             .style("opacity", 0);
         })
         .on("click", function (event, d) {
           showDetailPanel(d);
         })
         ;
-    const texts = labelLayer.selectAll(".dot-label")
-      .data(filteredData)
-      .join("text")
-      .attr("class", "dot-label")
-      .attr("x", d => xScale(d[xMetric]))
-      .attr("y", d => yScale(d[yMetric]) - 22)
-      .text(d => d.name)
-      .style("text-anchor", "middle")
-      .style("font-size", "12px")
-      .style("fill", "#333")      
-      .on("mouseover", addToolTip(xMetric, yMetric))
-          .on("mouseout", function (d) {
-              tooltip.transition()
-                .duration(500)
-                .style("opacity", 0);
-            })
-            .on("click", function (event, d) {
-              showDetailPanel(d);
-            });
 
-    texts.each(function(d) {
-      // Ensure accurate measurement by deferring until after render
-      setTimeout(() => {
-        const textWidth = this.getComputedTextLength();
-        const padding = 10; // Adjust padding around text
-        const rectHeight = 20; // Set your desired rect height
+        const padding = 5;
+      const rectHeight = 14;
 
-        // Adjust x position to center the rect behind the text
-        const xPosition = xScale(d[xMetric]) - (textWidth / 2) - (padding / 2);
-        const rectWidth = textWidth + padding;
-        // Insert the rect before the text element so it appears behind
-        labelLayer.insert("rect",":first-child") // Ensure rects are behind all texts
-          .attr("x", xPosition)
-          .attr("y", yScale(d[yMetric]) - rectHeight + (rectHeight / 4)-22) // Adjust Y position as needed
-          .attr("width", rectWidth)
-          .attr("height", rectHeight)
-          .attr("rx", 5) // Customize the corner radius
-          .style("fill", "#ccc") // Customize the fill color
-          .attr("class", "dot-label-bg")
+        // if screen width is under 1000 draw no labels
+        if (newWidth < 500) {
+          return;
+        }
+      // ASSEMBLE LABELDATA
+      // store previous positions to prevent labels from jumping around
+      prevPositions = labelData.map(label => ({ x: label.x, y: label.y }));
 
-        ; 
+      labelData = filteredData.map(d => {
+        const x = xScale(d[xMetric]);
+        const y = yScale(d[yMetric]) - 22;
+        // TODO only do this one time at the beginning
+        const textWidth = getTextWidth(d.name);
 
-    // Ensure text is on top of the rect
-    this.parentNode.appendChild(this);
-  }
-  
-  
-  , 0);
-});  
+        return {
+          x: x,
+          y: y,
+          textWidth: textWidth,
+          data: d,
+          width: textWidth + padding,
+          height: rectHeight,
+        };
+      });
+      adjustLabels(labelData);
+
+      // DRAW LABEL BACKGROUNDS
+      const labelRects = labelLayer.selectAll(".dot-label-rect")
+        .data(labelData)
+        .join("rect")
+        .attr("class", "dot-label-rect")
+        .attr("x", d => d.x - (d.width / 2))
+        .attr("y", d => d.y - (d.height / 2) - (padding))
+        .attr("width", d => d.width)
+        .attr("height", d => d.height+padding)
+        .attr("rx", 5)
+        .style("fill", "#ccc");
+        //.style("fill", d => colorScale(d.company)); // This does not work for some reason
+
+
+      // DRAW LABEL TEXT
+      const labelTexts = labelLayer.selectAll(".dot-label-text")
+        .data(labelData)
+        .join("text")
+        .attr("class", "dot-label-text")
+        .attr("x", d => d.x)
+        .attr("y", d => d.y)
+        .text(d => d.data.name)
+        .style("text-anchor", "middle")
+        .style("font-size", "12px")
+        .style("fill", "#333")
+        .on("mouseover", addToolTip(xMetric, yMetric))
+        .on("mouseout", function (d) {
+          tooltip.transition()
+            .duration(500)
+            .style("opacity", 0);
+        })
+        .on("click", function (event, d) {
+          showDetailPanel(d.data);
+        });
+
+    
     }
   
+    function adjustLabels(labelData) {
+      const maxIterations = 500;
+      let iteration = 0;
+      let overlaps = true;
+
+      while (overlaps && iteration < maxIterations) {
+        overlaps = false;
+        for (let i = 0; i < labelData.length - 1; i++) {
+          const label1 = labelData[i];
+
+          for (let j = i + 1; j < labelData.length; j++) {
+            const label2 = labelData[j];
+            if (isOverlapping(label1, label2)) {
+              overlaps = true;
+              const dx = label2.x - label1.x;
+              const dy = label2.y - label1.y;
+              const distance = Math.sqrt(dx * dx + dy * dy);
+              const overlap = (label1.width + label2.width) / 2 - distance;
+              const adjustmentX = (dx / distance) * overlap * (0.2);
+              const adjustmentY = (dy / distance) * overlap * (0.2);
+              label1.x -= adjustmentX;
+              label1.y -= adjustmentY;
+              label2.x += adjustmentX;
+              label2.y += adjustmentY;
+            }
+          }
+        }
+
+        iteration++;
+      }
+
+      // Update label positions based on previous positions
+      labelData.forEach((label, index) => {
+        if (prevPositions[index]) {
+          const distanceThreshold = 10; // Adjust this value as needed
+
+
+          const prevX = prevPositions[index].x;
+          const prevY = prevPositions[index].y;
+          // Calculate the distance between the current and previous positions
+          const distance = Math.sqrt((label.x - prevX) ** 2 + (label.y - prevY) ** 2);
+
+          // If the distance is within the threshold, use the previous position
+          if (distance < distanceThreshold) {
+            console.log("Using previous position")
+            label.x = prevX;
+            label.y = prevY;
+          }
+        }
+      });
+    
+    }
+
+
+  function isOverlapping(label1, label2) {
+    const dx = Math.abs(label1.x - label2.x);
+    const dy = Math.abs(label1.y - label2.y);
+    return dx < (label1.width + label2.width) / 2 &&
+          dy < (label1.height + label2.height) / 2;
+  }
+
+
+
+
+
+
     function updateTable() {
       const tbody = d3.select("#dataTable tbody");
   
