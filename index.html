@@ -414,7 +414,7 @@
               "multi-turn" chats (conversations involving back-and-forth). A
               description is <a
                 href="https://klu.ai/glossary/mt-bench-eval">here</a>.</li>
-            <li><strong>GPQA:</strong>GPQA is an extraordinarily challenging
+            <li><strong>GPQA:</strong> GPQA is an extraordinarily challenging
               multiple-choice question database similar to what an advanced
               graduate student or scientific expert might learn. Learn more
               about it <a href="https://github.com/idavidrein/gpqa">
@@ -711,6 +711,10 @@
         }
   }
 
+  function closeAllToolTips() {
+    d3.select(".tooltip").style("opacity", 0);
+  }
+
 function getTextWidth(text) {
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d");
@@ -905,17 +909,12 @@ function update(xMetric, yMetric) {
     }
 
 
-  function isOverlapping(label1, label2) {
-    const dx = Math.abs(label1.x - label2.x);
-    const dy = Math.abs(label1.y - label2.y);
-    return dx < (label1.width + label2.width) / 2 &&
-          dy < (label1.height + label2.height) / 2;
-  }
-
-
-
-
-
+    function isOverlapping(label1, label2) {
+        const dx = Math.abs(label1.x - label2.x);
+        const dy = Math.abs(label1.y - label2.y);
+        return dx < (label1.width + label2.width) / 2 &&
+              dy < (label1.height + label2.height) / 2;
+      }
 
     function updateTable() {
       const tbody = d3.select("#dataTable tbody");
@@ -998,6 +997,7 @@ function update(xMetric, yMetric) {
     }
   
     function closeDetailPanel() {
+      closeAllToolTips();
       d3.select("#detailPanel").classed("show", false);
       d3.select("#detailPanel").style("display", "none");
 
@@ -1008,7 +1008,7 @@ function update(xMetric, yMetric) {
     }
   
     function resizeGraph() {
-      
+      closeAllToolTips();
       newWidth = graphContainer.node().getBoundingClientRect().width - margin.left - margin.right;
       newHeight = graphContainer.node().getBoundingClientRect().height - margin.top - margin.bottom;
       svg.attr("width", "80%") //newWidth + margin.left + margin.right)
@@ -1023,6 +1023,7 @@ function update(xMetric, yMetric) {
     }
   
     function openTab(evt, tabName) {
+      closeAllToolTips();
       const tabcontent = document.getElementsByClassName("tabcontent");
       for (let i = 0; i < tabcontent.length; i++) {
         tabcontent[i].style.display = "none";
