@@ -220,12 +220,24 @@
       color: white;
       text-decoration: none;
     }
-
-  @media screen and (max-width: 1000px) {
-  .select {
+    .dropdown {
     font-size: 18px;
     padding: 10px;
   }
+  .dropdownholder {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    font-size: 18px;
+  }
+  .vs {
+    margin-left: 20px;
+    margin-right: 20px;
+
+    font-size: 30px;
+  }
+
+  @media screen and (max-width: 1000px) {
 
   .detail-panel {
     position: fixed;
@@ -269,16 +281,15 @@
     </div>
 
     <div id="graph" class="tabcontent">
-      <div>
-        X-axis:
-        <select id="xMetric">
+      <div class="dropdownholder">
+        <select id="xMetric" class="dropdown">
           <option value="output_tokens_price_per_million">Output Tokens Price
             per Million (USD)</option>
           <option value="input_tokens_price_per_million">Input Tokens Price per
             Million (USD)</option>
         </select>
-        Y-axis:
-        <select id="yMetric">
+        <div class="vs">vs.</div>
+        <select id="yMetric" class="dropdown">
           <option value="score">Chatbot Arena ELO</option>
           <option value="mmlu_score">MMLU Score</option>
           <option value="mt_bench">MT-Bench</option>
