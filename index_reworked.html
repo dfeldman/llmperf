@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>LLMPerf</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Open Sans', sans-serif;
+      background-color: #f5f5f7;
+      margin: 0;
+      padding: 0;
+    }
+
+    .header {
+      background-color: #1d1d1f;
+      color: white;
+      padding: 10px;
+      margin: 0px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: 300;
+      letter-spacing: 2px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .header h1 {
+      padding: 0;
+      margin: 0;
+    }
+
+    .tab {
+      overflow: hidden;
+      background-color: #f5f5f7;
+      display: flex;
+      justify-content: center;
+    }
+
+    .tab button {
+      background-color: inherit;
+      border: none;
+      outline: none;
+      cursor: pointer;
+      padding: 14px 16px;
+      transition: 0.3s;
+      font-size: 17px;
+      color: #1d1d1f;
+      border-bottom: 2px solid transparent;
+      font-weight: 400;
+    }
+
+    .tab button:hover {
+      color: #0070c9;
+      font-weight: 600;
+    }
+
+    .tab button.active {
+      color: #0070c9;
+      border-bottom: 2px solid #0070c9;
+      font-weight: 600;
+    }
+
+    .tabcontent {
+      display: none;
+      padding: 10px;
+      width: 100%;
+    }
+
+    dt {
+      font-weight: 600;
+      margin-top: 10px;
+    }
+
+    .axis path,
+    .axis line {
+      fill: none;
+      stroke: #1d1d1f;
+      shape-rendering: crispEdges;
+    }
+
+    .axis text {
+      font-size: 14px;
+      fill: #1d1d1f;
+    }
+
+    .grid line {
+      stroke: #ddd;
+      stroke-opacity: 0.7;
+      shape-rendering: crispEdges;
+      stroke-dasharray: 3, 3;
+    }
+
+    .grid path {
+      stroke-width: 0;
+    }
+
+    .dot {
+      stroke: #1d1d1f;
+      cursor: pointer;
+      r: 10;
+    }
+
+    .dot-label {
+      font-size: 12px;
+      text-anchor: middle;
+      fill: #1d1d1f;
+    }
+
+    .dot-label-bg {
+      font-size: 12px;
+      text-anchor: middle;
+      fill: #1d1d1f;
+    }
+
+    .detail-panel {
+      position: fixed;
+      right: -320px;
+      top: 120px;
+      width: 300px;
+      padding: 20px;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: right 0.3s;
+    }
+
+    .detail-panel.show {
+      right: 20px;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 40px;
+      cursor: pointer;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 20px;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f5f5f7;
+      font-weight: 600;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    .legend {
+      margin-top: 20px;
+      display: flex;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+      padding: 10px;
+    }
+
+    .legend-color {
+      width: 15px;
+      height: 15px;
+      margin-right: 5px;
+    }
+
+    .notification-bar {
+      background: linear-gradient(to right, #f5deb3, #d2b48c);
+      color: black;
+      padding: 10px;
+      text-align: center;
+      font-size: 14px;
+      border-radius: 10px;
+      margin: 20px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .tooltip {
+      position: absolute;
+      background-color: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 10px;
+      border-radius: 5px;
+      pointer-events: none;
+      font-size: 14px;
+      line-height: 1.4;
+      max-width: 250px;
+      word-wrap: break-word;
+    }
+
+    .axis-label {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    #graph {
+      position: relative;
+      width: 90%;
+      height: calc(100vh - 150px);
+      transition: width 0.3s;
+      width: 95%;
+    }
+
+    #graph.sidebar-open {
+      width: calc(100% - 320px);
+    }
+
+    #graphCore {
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: right 0.3s;
+      margin: 10px;
+      width: 90%;
+    }
+
+    #footer {
+      width: 100%;
+      display: block;
+      background-color: #1d1d1f;
+      color: white;
+      text-align: center;
+      padding: 10px;
+    }
+
+    #footer a {
+      color: white;
+      text-decoration: none;
+    }
+
+    .dropdown {
+      font-size: 18px;
+      padding: 10px;
+    }
+
+    .dropdownholder {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+      font-size: 18px;
+    }
+
+    .vs {
+      margin-left: 20px;
+      margin-right: 20px;
+      font-size: 30px;
+    }
+
+    .selection-widget {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .selection-widget div {
+      padding: 10px;
+      background-color: white;
+      border-radius: 5px;
+      margin: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .selection-widget div.selected {
+      background-color: #f0f0f0;
+    }
+
+    .selection-widget div:hover {
+      background-color: #f0f0f0;
+    }
+
+    .selection-widget div input[type="checkbox"] {
+      margin-right: 5px;
+    }
+
+    @media screen and (max-width: 1200px) {
+      .detail-panel {
+        position: fixed;
+        top: 20px;
+        left: 0;
+        width: 93%;
+        height: 70%;
+        overflow-y: auto;
+        z-index: 9999;
+        display: none;
+      }
+
+      .dot {
+        r: 15;
+      }
+
+      .dot-label {
+        display: none;
+      }
+
+      .dot-label-bg {
+        display: none;
+      }
+
+      .axis-label {
+        font-size: 18px;
+      }
+
+      .selection-widget {
+        flex-direction: column;
+      }
+    }
+
+    @media (pointer: coarse) {
+      .dot {
+        r: 30;
+      }
+
+      .dot-label {
+        display: none;
+      }
+
+      .dot-label-bg {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+    <div class="header">
+      <h1>LLMPerf</h1>
+    </div>
+
+    <div class="notification-bar">
+      Updated March 31: Added Command R and Qwen, added mobile UI and FAQ
+    </div>
+
+    <div class="tab">
+      <button class="tablinks" onclick="openTab(event, 'graph')">Graph</button>
+      <button class="tablinks" onclick="openTab(event, 'table')">Table</button>
+      <button class="tablinks" onclick="openTab(event, 'faq')">FAQ</button>
+    </div>
+
+    <div id="graph" class="tabcontent">
+      <div class="dropdownholder">
+        <select id="xMetric" class="dropdown">
+          <option value="output_tokens_price_per_million">Output Tokens Price
+            per Million (USD)</option>
+          <option value="input_tokens_price_per_million">Input Tokens Price per
+            Million (USD)</option>
+        </select>
+        <div class="vs">vs.</div>
+        <select id="yMetric" class="dropdown">
+          <option value="score">Chatbot Arena ELO</option>
+          <option value="mmlu_score">MMLU Score</option>
+          <option value="mt_bench">MT-Bench</option>
+          <option value="context_length">Context</option>
+          <option value="gpqa">GPQA</option>
+          <option value="human_eval">HumanEval (Coding)</option>
+        </select>
+      </div>
+      <div id="detailPanel" class="detail-panel">
+        <span class="close-btn" onclick="closeDetailPanel()">&times;</span>
+        <h2 id="selectedLLM"></h2>
+        <p id="llmDescription"></p>
+        <p>Company: <a id="companyLink" target="_blank"></a></p>
+        <table id="llmStats">
+          <tbody>
+          </tbody>
+        </table>
+      </div>
+      <div id="graphCore"></div>
+      <div class="legend"></div>
+    </div>
+
+    <div id="table" class="tabcontent">
+      <table id="dataTable">
+        <thead>
+          <tr>
+            <th>Model/Service</th>
+            <th>Company</th>
+            <th>Input Tokens Price per Million (USD)</th>
+            <th>Output Tokens Price per Million (USD)</th>
+            <th>Context Length</th>
+            <th>Chatbot Arena ELO</th>
+            <th>MMLU Score</th>
+            <th>MT-Bench</th>
+            <th>GPQA</th>
+            <th>HumanEval (Coding)</th>
+            <th>Release Date</th>
+            <th>Knowledge Cutoff Date</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+      <div class="legend"></div>
+
+    </div>
+
+    <div id="faq" class="tabcontent">
+      <h2>FAQ</h2>
+      <dl>
+        <dt>What is an LLM?</dt>
+        <dd>LLM stands for Large Language Model, which is a type of artificial
+          intelligence that understands and generates human-like text based on
+          the input it receives. LLMs are trained on vast datasets of human
+          language and can perform a wide range of language-related tasks.</dd>
+
+        <dt>Why do you display obsolete models?</dt>
+        <dd>We display obsolete models to provide a comprehensive historical
+          context and enable performance comparisons over time. This helps users
+          understand the evolution of LLM technology and its capabilities.</dd>
+
+        <dt>Why don't you display very old models?</dt>
+        <dd>Very old models are omitted to maintain the relevance and clarity of
+          our benchmarks. Including them might clutter the data and make it
+          harder for users to find useful information about current and recently
+          obsolete models.</dd>
+
+        <dt>How do you gather pricing information for open models?</dt>
+        <dd>For the open models, you can download and run the weights yourself
+          for free -- but you probably will not due to the very expensive GPUs
+          required. Instead, this site shows prices from together.ai, a low-cost
+          service that hosts open models for you.</dd>
+
+        <dt>What is context length?</dt>
+        <dd>Context length refers to the maximum number of tokens an LLM can
+          process in a single prompt. A token can be a word, part of a word, or
+          even punctuation, depending on the model's training data and
+          tokenization method. This parameter is crucial as it affects the
+          model's ability to understand and generate coherent and contextually
+          relevant responses.</dd>
+
+        <dt>What are the metrics shown?</dt>
+        <dd>The metrics displayed on our site include Chatbot Arena ELO, MMLU
+          (Massive Multitask Language Understanding), MT-Bench (Multi-turn Benchmark), 
+          GPQA (Google-proof Question and Answer), and
+          HumanEval. These metrics are used to evaluate the performance of LLMs
+          across different tasks and capabilities.</dd>
+
+        <dt>How often is the data updated?</dt>
+        <dd>The data is updated approximately once a week. This frequency
+          ensures that our benchmarks remain up-to-date and reflect the latest
+          developments and improvements in LLM technology.</dd>
+
+        <dt>Why is Grok not included?</dt>
+        <dd>We don't yet have any benchmark data for Grok.</dd>
+
+        <dt>Which metric is best for my application?</dt>
+        <dd>The best metric for your application depends on the specific tasks
+          you intend to use the LLM for.
+          <ul>
+            <li><strong>Chatbot Arena ELO:</strong> This is a human-rated score
+              where the human asks two randomly-chosen LLMs the same question and chooses the superior
+              answer. The ChatBot
+              Arena is <a
+                href="https://huggingface.co/spaces/lmsys/chatbot-arena-leaderboard">here.</a></li>
+            <li><strong>MMLU:</strong> MMLU is a very large database of
+              school-test-like multiple choice questions, similar to what an
+              undergraduate student might learn. Try it <a
+                href="https://d.erenrich.net/are-you-smarter-than-an-llm/index.html">here</a>.</li>
+            <li><strong>MT-Bench:</strong> MT-Bench is a benchmark for
+              "multi-turn" chats (conversations involving back-and-forth). A
+              description is <a
+                href="https://klu.ai/glossary/mt-bench-eval">here</a>.</li>
+            <li><strong>GPQA:</strong> GPQA is an extraordinarily challenging
+              multiple-choice question database similar to what an advanced
+              graduate student or scientific expert might learn. Learn more
+              about it <a href="https://github.com/idavidrein/gpqa">
+                here</a>.</li>
+            <li><strong>HumanEval:</strong> HumanEval is a code generation
+              benchmark that pairs questions in 23 natural languages with 12
+              different programming languages. The benchmark asks a question in
+              a natural language; gets a small piece of code; and runs it to
+              verify functionality.</li>
+          </ul>
+          <p>For many applications, Chatbot Arena ELO is the best metric to use, since it cannot
+          be trained for in advance and is evaluated by humans and an independent organization. 
+          One downside of Chatbot Arena is that humans typically favor longer responses, even if a shorter
+          response is equally correct. The highest-scoring models on Chatbot Arena do tend to produce long responses. </p>
+
+          <p>MMLU, MT-Bench, HumanEval, and GPQA are automatically evaluated, so they are not biased by long answers. 
+          The risk with these four benchmarks is that correct answers might leak into training data. 
+          This is particularly a problem for MMLU, since the questions and answers are widely available. 
+          MT-Bench and HumanEval mitigate this by using automatically-generated questions, and GPQA mitigates this
+          by not publicly releasing the correct answers. However, at least in theory, a model could be excessively
+          fine-tuned for these benchmarks. </p>
+        </dd>
+      </dl>
+    </div>
+
+    <div id="footer">
+      <h3>
+        <a href="https://github.com/dfeldman/llmperf" target="_blank">
+          <img
+            src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
+            alt="GitHub Link" style="width: 32px; height: 32px;"> Edit on GitHub
+        </a>
+      </h3>
+    </div>
+    <script>
+    const data = [
+      {
+        name: "Claude 3 Haiku",
+        input_tokens_price_per_million: 0.25,
+        output_tokens_price_per_million: 1.25,
+        context_length: 200,
+        score: 1179,
+        mmlu_score: 75.2,
+        mt_bench: null,
+        gpqa: 33.3,
+        human_eval: 75,
+        company: "Anthropic",
+        description: "Claude 3 Haiku is a powerful language model developed by Anthropic, offering high-quality text generation with a context length of 200K tokens.",
+        companyWebsite: "https://www.anthropic.com",
+        release: "2024-03-14",
+        cutoff: "2023-08-01"
+      },
+      {
+        name: "Claude 3 Sonnet",
+        input_tokens_price_per_million: 3,
+        output_tokens_price_per_million: 15,
+        context_length: 200,
+        score: 1198,
+        mmlu_score: 79.0,
+        mt_bench: null,
+        gpqa: 40.4,
+        human_eval: 73,
+        company: "Anthropic",
+        description: "Claude 3 Sonnet is another impressive language model by Anthropic, providing excellent performance for various natural language tasks with a context length of 200K tokens.",
+        companyWebsite: "https://www.anthropic.com",
+        release: "2024-03-14",
+        cutoff: "2023-08-01"
+      },
+      {
+        name: "Claude 3 Opus",
+        input_tokens_price_per_million: 15,
+        output_tokens_price_per_million: 75,
+        context_length: 200,
+        score: 1253,
+        mmlu_score: 86.8,
+        mt_bench: null,
+        gpqa: 50.4,
+        human_eval: 84.9,
+        company: "Anthropic",
+        description: "Claude 3 Opus is the most advanced language model in the Claude 3 series by Anthropic, delivering top-notch performance with a context length of 200K tokens.",
+        companyWebsite: "https://www.anthropic.com",
+        release: "2024-03-14",
+        cutoff: "2023-08-01"
+      },
+      {
+        name: "GPT-4 Turbo",
+        input_tokens_price_per_million: 10,
+        output_tokens_price_per_million: 30,
+        context_length: 128,
+        score: 1251,
+        mmlu_score: 86.4,
+        mt_bench: 9.32,
+        gpqa: 35.7,
+        human_eval: 74.5,
+        company: "OpenAI",
+        description: "GPT-4 Turbo is a high-performance language model by OpenAI, offering a context length of 128K tokens for efficient and accurate text generation.",
+        companyWebsite: "https://www.openai.com",
+        cutoff: "2023-04-01",
+        release: "202-06-13"
+      },
+      {
+        name: "GPT-4",
+        input_tokens_price_per_million: 30,
+        output_tokens_price_per_million: 60,
+        context_length: 32,
+        score: 1159,
+        mmlu_score: 86.4,
+        mt_bench: 8.96,
+        gpqa: 35.7,
+        human_eval: 74.5,
+        company: "OpenAI",
+        description: "GPT-4 is the original, now-deprecated version of GPT-4. New users should switch to GPT-4 Turbo.",
+        companyWebsite: "https://www.openai.com",
+        release: "2023-03-14",
+        cutoff: "2021-09-01",
+      },
+      {
+        name: "GPT-3.5 Turbo 0613",
+        input_tokens_price_per_million: 0.50,
+        output_tokens_price_per_million: 1.50,
+        context_length: 16,
+        score: 1114,
+        mmlu_score: 70,
+        mt_bench: 8.39,
+        gpqa: 28.1,
+        human_eval: null,
+        company: "OpenAI",
+        description: "GPT-3.5 Turbo 0613 is a powerful language model by OpenAI, offering a context length of 16K tokens for efficient and high-quality text generation.",
+        companyWebsite: "https://www.openai.com",
+        release: "2023-06-13",
+        cutoff: "2021-09-01"
+      },
+      {
+        name: "Mistral Medium",
+        input_tokens_price_per_million: 2.7,
+        output_tokens_price_per_million: 8.1,
+        context_length: 8,
+        score: 1145,
+        mmlu_score: null,
+        mt_bench: null,
+        gpqa: null,
+        human_eval: null,
+        company: "Mistral",
+        description: "Mistral Medium is a language model developed by Mistral, offering a context length of 8K tokens for various natural language tasks.",
+        companyWebsite: "http://mistral.ai",
+        release: "2024-02-25",
+
+      },
+      {
+        name: "Mistral Large",
+        input_tokens_price_per_million: 8,
+        output_tokens_price_per_million: 24,
+        context_length: 32,
+        score: 1157,
+        mmlu_score: null,
+        mt_bench: null,
+        gpqa: null,
+        human_eval: null,
+        company: "Mistral",
+        description: "Mistral Large is a more advanced language model by Mistral, delivering improved performance with a context length of 32K tokens.",
+        companyWebsite: "http://mistral.ai",
+        release: "2024-02-25",
+        cutoff: "2022-12-01"
+      },
+      {
+        name: "Gemini Dev API",
+        input_tokens_price_per_million: 0.50,
+        output_tokens_price_per_million: 1.50,
+        context_length: 128,
+        score: 1125,
+        mmlu_score: 83.7,
+        mt_bench: null,
+        gpqa: null,
+        human_eval: 74.4,
+        company: "Google",
+        description: "Gemini Dev API is a language model offered by Google, providing a context length of 128K tokens for various natural language processing tasks.",
+        companyWebsite: "https://www.google.com",
+        release: "2024-02-15",
+        cutoff: "2023-04-01",
+      },
+      {
+        name: "Gemini Pro (Bard)",
+        input_tokens_price_per_million: null,
+        output_tokens_price_per_million: null,
+        context_length: 128,
+        score: 1203,
+        mmlu_score: null,
+        mt_bench: null,
+        gpqa: null,
+        human_eval: null,
+        company: "Google",
+        description: "Gemini Advanced is a high-performance language model by Google, offering a context length of 128K tokens for advanced natural language applications.",
+        companyWebsite: "https://www.google.com",
+        release: "Unknown",
+        cutoff: "Online"
+      },
+      {
+        name: "Qwen1.5-72B-Chat",
+        input_tokens_price_per_million: 0.90, 
+        output_tokens_price_per_million: 0.90,
+        context_length: 32,
+        score: 1149,
+        mmlu_score: 77.5,
+        human_eval: 42.5,
+        mt_bench: 8.61,
+        company: "Alibaba (Open)",
+        description: "Qwen1.5-72B-Chat is a high-performance open language model by Alibaba.",
+        companyWebsite: "https://qwenlm.github.io/blog/qwen1.5/",
+        cutoff: "2024-02-01",
+        release: "2024-02-04"
+      },
+      {
+        name: "Command R",
+        input_tokens_price_per_million: 0.90,
+        output_tokens_price_per_million: 0.90,
+        score: 1146,
+        context_length: 32,
+        company: "Cohere (Open)",
+        description: "Command R is an open model intended specifically for retrieval-augemented generation (RAG) tasks.",
+        companyWebsite: "https://cohere.ai",
+        cutoff: "2024-03-11"
+      }
+    ];
+  
+    function formatName(internalName) {
+      switch (internalName) {
+        case "output_tokens_price_per_million":
+          return "Output Tokens Price per Million (USD)";
+        case "input_tokens_price_per_million":
+          return "Input Tokens Price per Million (USD)";
+        case "score":
+          return "Chatbot Arena ELO";
+        case "mmlu_score":
+          return "MMLU Score";
+        case "mt_bench":
+          return "MT-Bench";
+        case "context_length":
+          return "Context Length";
+        case "gpqa":
+          return "GPQA";
+        case "human_eval":
+          return "HumanEval (Coding)";
+        case "release":
+          return "Release Date"
+        case "cutoff":
+          return "Knowledge Cutoff Date"
+        default:
+          return internalName;
+      }
+  }
+
+  const graphContainer = d3.select("#graphCore");
+    const margin = { top: 40, right: 20, bottom: 60, left: 60 };
+    const width = 800 - margin.left - margin.right;
+    const height = 600 - margin.top - margin.bottom;
+    const svg = graphContainer.append("svg")
+      .attr("width", "100%")
+      .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+      .attr("transform", `translate(${margin.left},${margin.top})`);
+
+    const xScale = d3.scaleLinear().range([0, width]);
+    const yScale = d3.scaleLinear().range([height, 0]);
+    const colorScale = d3.scaleOrdinal(d3.schemePastel1);
+
+    const xAxis = d3.axisBottom(xScale);
+    const yAxis = d3.axisLeft(yScale);
+
+    let labelData = [];
+    let lastYMetric = "";
+    let lastXMetric = "";
+    let prevPositions = {};
+    const tooltip = d3.select("body").append("div")
+      .attr("class", "tooltip")
+      .style("opacity", 0);
+    
+
+    function addToolTip(xMetric, yMetric) {
+    return function (event, d) {
+      if (d.data) {
+        d = d.data;
+      }
+          tooltip.transition()
+            .duration(200)
+            .style("opacity", .9);
+          tooltip.html(`
+            <strong>${d.name}</strong><br/>
+            ${formatName(xMetric)}: ${d[xMetric]}<br/>
+            ${formatName(yMetric)}: ${d[yMetric]}<br/>
+            Company: ${d.company}
+          `)
+            .style("left", (event.pageX + 10) + "px")
+            .style("top", (event.pageY - 28) + "px");
+        }
+  }
+
+  function closeAllToolTips() {
+    d3.select(".tooltip").style("opacity", 0);
+  }
+
+
+
+function getTextWidth(text) {
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d");
+  context.font = "12px sans-serif"; // Specify the font style and size
+  const width = context.measureText(text).width;
+  return width;
+}
+
+
+function isTopModel(d, xMetric, yMetric) {
+      const selectedModel = d;
+      const otherModels = data.filter(model => model !== selectedModel);
+
+      return otherModels.every(model => {
+        return (
+          (model[xMetric] === null || model[xMetric] > selectedModel[xMetric]) ||
+          (model[xMetric] <= selectedModel[xMetric] && model[yMetric] < selectedModel[yMetric])
+        );
+      });
+    }
+
+    function update(xMetric, yMetric) {
+      newWidth = graphContainer.node().getBoundingClientRect().width - margin.left - margin.right;
+      newHeight = graphContainer.node().getBoundingClientRect().height - margin.top - margin.bottom;
+      const filteredData = data.filter(d => d[xMetric] !== null && d[yMetric] !== null && d[xMetric] !== undefined && d[yMetric] !== undefined);
+
+      svg.selectAll(".axis-layer").remove();
+      svg.selectAll(".dot-layer").remove();
+      svg.selectAll(".label-layer").remove();
+      svg.selectAll(".grid-layer").remove();
+      const axisLayer = svg.append("g").attr("class", "axis-layer");
+      const dotLayer = svg.append("g").attr("class", "dot-layer");
+      const labelLayer = svg.append("g").attr("class", "label-layer");
+      const gridLayer = svg.append("g").attr("class", "grid-layer");
+
+      xScaleOrig = d3.extent(filteredData, d => d[xMetric]);
+      xScaleOrig[1] = xScaleOrig[1] * 1.2;
+      xScale.domain(xScaleOrig).nice();
+      yScale.domain(d3.extent(filteredData, d => d[yMetric])).nice();
+
+      // Add grid lines
+      gridLayer.append("g")
+        .attr("class", "grid")
+        .attr("transform", `translate(0,${height})`)
+        .call(d3.axisBottom(xScale)
+          .tickSize(-height)
+          .tickFormat("")
+        );
+
+      gridLayer.append("g")
+        .attr("class", "grid")
+        .call(d3.axisLeft(yScale)
+          .tickSize(-width)
+          .tickFormat("")
+        );
+
+      axisLayer.selectAll(".x-axis").remove();
+      axisLayer.append("g")
+        .attr("class", "x-axis")
+        .attr("transform", `translate(0,${height})`)
+        .call(xAxis)
+        .append("text")
+        .attr("class", "axis-label")
+        .attr("x", (width - margin.left - margin.right) / 2)
+        .attr("y", margin.bottom - 10)
+        .attr("fill", "black")
+        .style("text-anchor", "middle")
+        .text(formatName(xMetric));
+
+      axisLayer.selectAll(".y-axis").remove();
+      axisLayer.append("g")
+        .attr("class", "y-axis")
+        .call(yAxis)
+        .append("text")
+        .attr("class", "axis-label")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -(height - margin.top - margin.bottom) / 2)
+        .attr("y", -margin.left + 20)
+        .attr("fill", "black")
+        .style("text-anchor", "middle")
+        .style("z-index", "-1000")
+        .text(formatName(yMetric));
+
+      dotLayer.selectAll(".dot").remove();
+      dotLayer.selectAll().remove();
+
+      dotLayer.selectAll(".dot")
+        .data(filteredData)
+        .join("circle")
+        .attr("class", "dot")
+        .attr("cx", d => xScale(d[xMetric]))
+        .attr("cy", height)
+        .attr("r", 6)
+        .style("fill", d => isTopModel(d, xMetric, yMetric) ? colorScale(d.company) : "#ddd")
+        .on("mouseover", addToolTip(xMetric, yMetric))
+        .on("mouseout", function (d) {
+          tooltip.transition()
+            .duration(1200)
+            .style("opacity", 0);
+        })
+        .on("click", function (event, d) {
+          showDetailPanel(d);
+        })
+        .transition()
+        .duration(1000)
+        .attr("cy", d => yScale(d[yMetric]));
+
+      const padding = 5;
+      const rectHeight = 14;
+
+      if (newWidth < 500) {
+        return;
+      }
+
+      prevPositions = labelData.map(label => ({ x: label.x, y: label.y }));
+
+      labelData = filteredData.map(d => {
+        const x = xScale(d[xMetric]);
+        const y = yScale(d[yMetric]) - 22;
+        const textWidth = getTextWidth(d.name);
+
+        return {
+          x: x,
+          y: y,
+          textWidth: textWidth,
+          data: d,
+          width: textWidth + padding,
+          height: rectHeight,
+        };
+      });
+
+      adjustLabels(labelData);
+
+      const labelRects = labelLayer.selectAll(".dot-label-rect.data(labelData)").join("rect")
+.attr("class", "dot-label-rect")
+.attr("x", d => d.x - (d.width / 2))
+.attr("y", d => d.y - (d.height / 2) - (padding))
+.attr("width", d => d.width)
+.attr("height", d => d.height + padding)
+.attr("rx", 5)
+.style("fill", "#ccc");
+const labelTexts = labelLayer.selectAll(".dot-label-text")
+    .data(labelData)
+    .join("text")
+    .attr("class", "dot-label-text")
+    .attr("x", d => d.x)
+    .attr("y", height)
+    .text(d => d.data.name)
+    .style("text-anchor", "middle")
+    .style("font-size", "12px")
+    .style("fill", "#333")
+    .on("mouseover", addToolTip(xMetric, yMetric))
+    .on("mouseout", function (d) {
+      tooltip.transition()
+        .duration(500)
+        .style("opacity", 0);
+    })
+    .on("click", function (event, d) {
+      showDetailPanel(d.data);
+    })
+    .transition()
+    .duration(1000)
+    .attr("y", d => d.y);
+
+  const labelsVisible = d3.select("#labelCheckbox").property("checked");
+  labelRects.style("display", labelsVisible ? "block" : "none");
+  labelTexts.style("display", labelsVisible ? "block" : "none");
+}
+function adjustLabels(labelData) {
+      const maxIterations = 500;
+      let iteration = 0;
+      let overlaps = true;
+
+      while (overlaps && iteration < maxIterations) {
+        overlaps = false;
+        for (let i = 0; i < labelData.length - 1; i++) {
+
+          const label1 = labelData[i];
+
+          for (let j = i + 1; j < labelData.length; j++) {
+            const label2 = labelData[j];
+            if (isOverlapping(label1, label2)) {
+              overlaps = true;
+              const dx = label2.x - label1.x;
+              const dy = label2.y - label1.y;
+              const distance = Math.sqrt(dx * dx + dy * dy);
+              const overlap = nanToSmall((label1.width + label2.width) / 2 - distance);
+              const adjustmentX = nanToSmall(dx / distance) * overlap * (0.2);
+              const adjustmentY = nanToSmall(dy / distance) * overlap * (0.2);
+              label1.x -= adjustmentX;
+              label1.y -= adjustmentY;
+              label2.x += adjustmentX;
+              label2.y += adjustmentY;
+            }
+          }
+          //console.log("first pass end",labelData[i].data.name, labelData[i].x, labelData[i].y)
+        }
+
+        iteration++;
+      }
+
+      // Update label positions based on previous positions
+      labelData.forEach((label, index) => {
+        if (prevPositions[index]) {
+          const distanceThreshold = 10; // Adjust this value as needed
+
+          const prevX = prevPositions[index].x;
+          const prevY = prevPositions[index].y;
+          // Calculate the distance between the current and previous positions
+          const distance = Math.sqrt((label.x - prevX) ** 2 + (label.y - prevY) ** 2);
+
+          // If the distance is within the threshold, use the previous position
+          if (distance < distanceThreshold) {
+            //console.log("Switch back to previous position", label.x, label.y, prevX, prevY)
+            label.x = prevX;
+            label.y = prevY;
+          }
+        } else {
+          //console.log("No previous position found")
+        }
+      });
+    
+    }
+
+
+    function isOverlapping(label1, label2) {
+        const dx = Math.abs(label1.x - label2.x);
+        const dy = Math.abs(label1.y - label2.y);
+        return dx < (label1.width + label2.width) / 2 &&
+              dy < (label1.height + label2.height) / 2;
+      }
+
+    function updateTable() {
+      const tbody = d3.select("#dataTable tbody");
+  
+      const rows = tbody.selectAll("tr")
+        .data(data)
+        .join("tr");
+  
+      rows.selectAll("td")
+        .data(d => [
+          d.name,
+          `<a href="${d.companyWebsite}" target="_blank">${d.company}</a>`,
+          d.input_tokens_price_per_million,
+          d.output_tokens_price_per_million,
+          d.context_length,
+          d.score,
+          d.mmlu_score,
+          d.mt_bench,
+          d.gpqa,
+          d.human_eval,
+          d.release,
+          d.cutoff,
+        ])
+        .join("td")
+        .html(d => d);
+  
+      rows.style("background-color", d => colorScale(d.company));
+    }
+  
+    function updateLegend() {
+      const legend = d3.select(".legend");
+  
+      const legendItems = legend.selectAll(".legend-item")
+        .data(colorScale.domain())
+        .join("div")
+        .attr("class", "legend-item");
+  
+      legendItems.append("div")
+        .attr("class", "legend-color")
+        .style("background-color", d => colorScale(d));
+  
+      legendItems.append("a")
+        .text(d => d)
+        .attr("href", d => data.find(item => item.company === d).companyWebsite)
+        .attr("target", "_blank");
+    }
+  
+    function showDetailPanel(d) {
+      d3.select("#selectedLLM").text(d.name);
+      d3.select("#llmDescription").text(d.description);
+      d3.select("#companyLink")
+        .text(d.company)
+        .attr("href", d.companyWebsite);
+  
+      const statsTable = d3.select("#llmStats tbody");
+      statsTable.html("");
+  
+      Object.entries(d).forEach(([key, value]) => {
+        if (key !== "name" && key !== "description" && key !== "company" && key !== "companyWebsite") {
+          formattedName = formatName(key)
+          if (value === null) {
+            value = "";
+          }
+          statsTable.append("tr")
+            .html(`<td>${formattedName}</td><td>${value}</td>`);
+        }
+      });
+  
+      d3.select("#detailPanel").classed("show", true);
+      graphContainer.classed("sidebar-open", true);
+
+      if (window.innerWidth <= 1000) {
+        graphContainer.style("display", "none");
+      } else {
+        graphContainer.classed("sidebar-open", true);
+      }
+
+      d3.select("#detailPanel").style("display", "block");
+      resizeGraph();
+    }
+  
+    function closeDetailPanel() {
+      closeAllToolTips();
+      d3.select("#detailPanel").classed("show", false);
+      d3.select("#detailPanel").style("display", "none");
+
+      graphContainer.classed("sidebar-open", false);
+
+      graphContainer.style("display", "block");
+      resizeGraph();
+    }
+  
+    function resizeGraph() {
+      closeAllToolTips();
+      newWidth = graphContainer.node().getBoundingClientRect().width - margin.left - margin.right;
+      newHeight = graphContainer.node().getBoundingClientRect().height - margin.top - margin.bottom;
+      svg.attr("width", "80%") //newWidth + margin.left + margin.right)
+        .attr("height", newHeight + margin.top + margin.bottom);
+      svg.select("g")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
+
+      xScale.range([0, newWidth]);
+      yScale.range([newHeight, 0]);
+
+      update(d3.select("#xMetric").property("value"), d3.select("#yMetric").property("value"));
+    }
+  
+    function openTab(evt, tabName) {
+      closeAllToolTips();
+      const tabcontent = document.getElementsByClassName("tabcontent");
+      for (let i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+      }
+  
+      const tablinks = document.getElementsByClassName("tablinks");
+      for (let i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+      }
+  
+      document.getElementById(tabName).style.display = "block";
+      evt.currentTarget.className += " active";
+    }
+  
+function updateMetricSelection(metric) {
+  d3.selectAll(".metric-selection div")
+    .classed("selected", false);
+
+  d3.select(`.metric-selection div[data-metric="${metric}"]`)
+    .classed("selected", true);
+
+  update(d3.select("#xMetric").property("value"), metric);
+}
+
+function updatePriceSelection(price) {
+  d3.selectAll(".price-selection div")
+    .classed("selected", false);
+
+  d3.select(`.price-selection div[data-price="${price}"]`)
+    .classed("selected", true);
+
+  update(price, d3.select("#yMetric").property("value"));
+}
+
+update("output_tokens_price_per_million", "score");
+updateTable();
+updateLegend();
+
+d3.selectAll(".metric-selection div")
+  .on("click", function () {
+    const selectedMetric = d3.select(this).attr("data-metric");
+    updateMetricSelection(selectedMetric);
+  });
+
+d3.selectAll(".price-selection div")
+  .on("click", function () {
+    const selectedPrice = d3.select(this).attr("data-price");
+    updatePriceSelection(selectedPrice);
+  });
+
+window.addEventListener("resize", resizeGraph);
+
+document.getElementsByClassName("tablinks")[0].click();
+
+resizeGraph();
+</script> </body> </html> 
